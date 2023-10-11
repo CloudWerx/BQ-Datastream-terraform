@@ -6,54 +6,58 @@ locals {
   aurora_database = var.aurora_connection_info.database
 }
 
-resource "google_datastream_connection_profile" "aws_aurora_profile" {
-  name     = "aws-aurora-profile"
-  project  = var.gcp_project
-  location = var.gcp_region
+#AWS RDS Connection Profile
+resource "google_datastream_connection_profile" "novi-connect-rds" {
+  display_name = "aws-rds-to-bigquery"
+  location = var.aws_region
+  connection_profile_id = "novi-connect-rds"
 
-  postgres_connection_profile {
+  forward_ssh_connectivity {
+    hostname = var.SSH_Hostname
+    username = var.SSH_User
+    port = var.SSH_Port
+    private_key =  var.SSH_private_key
+  }
+
+  postgresql_profile {
     hostname = local.aurora_host
     port     = local.aurora_port
     database = local.aurora_database
     username = local.aurora_username
     password = local.aurora_password
-
-    ssl_config {
-      enabled = false
-    }
   }
 }
 
-# Create BigQuery Dataset
-resource "google_bigquery_dataset" "datastream_dataset" {
-  dataset_id = "datastream_dataset"
-  location   = "US"
+#BigQuery Connection Profile
+resource "google_datastream_connection_profile" "bigquery-replica" {
+  display_name = "bigquery-replica"
+  location = var.gcp_region
+  connection_profile_id = "bigquery-replica"
+
+  bigquery_profile {}
 }
 
 # Create Datastream Stream
-resource "google_datastream_stream" "aurora_to_bigquery_stream" {
-  name     = "aurora-to-bigquery-stream"
-  project  = var.gcp_project
+resource "google_datastream_stream" "AWS RDS to Bigquery" {
+  display_name     = "aws-rds-to-bigquery"
   location = var.gcp_region
+  stream_id = "aws-rds-to-bigquery"
+  desired_state = "RUNNING"
 
   source_config {
-    source_connection_profile = google_datastream_connection_profile.aws_aurora_profile.self_link
+    source_connection_profile = google_datastream_connection_profile.novi-connect-rds.id
+    postgresql_source_config {
+      publication = "publication"
+      replication_slot = "replication_slot"
+    }
   }
 
   destination_config {
-    destination_connection_profile = google_datastream_connection_profile.gcp_bigquery_profile.self_link
+    destination_connection_profile = google_datastream_connection_profile.bigquery-replica.id
+    bigquery_destination_config {
+    data_freshness = "15s"
+    }
   }
+
+
 }
-
-# Create BigQuery Connection Profile
-resource "google_datastream_connection_profile" "gcp_bigquery_profile" {
-  name     = "gcp-bigquery-profile"
-  project  = var.gcp_project
-  location = var.gcp_region
-
-  bigquery_connection_profile {
-    dataset = google_bigquery_dataset.datastream_dataset.dataset_id
-  }
-}
-
-

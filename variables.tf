@@ -28,3 +28,21 @@ variable "aurora_connection_info" {
     database = string
   })
 }
+
+variable "SSH_Hostname" {
+  description = "SSH Tunnel Host"
+  type = string
+}
+
+variable "SSH_User" {
+  type = string
+}
+
+variable "SSH_Port" {
+  type = number
+}
+
+variable "SSH_private_key" {
+  type = string
+}
+
