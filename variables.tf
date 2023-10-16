@@ -3,6 +3,14 @@ variable "gcp_project" {
   type        = string
 }
 
+variable "rds_connection_name" {
+  type = string
+}
+
+variable "rds_connection_profile_id" {
+  type = string
+}
+
 variable "gcp_credentials_file" {
   type = string
 }
@@ -42,6 +50,14 @@ variable "SSH_Port" {
 }
 
 variable "SSH_private_key" {
+  type = string
+}
+
+variable "publication_name" {
+  type = string
+}
+
+variable "replication_slot_name" {
   type = string
 }
 

@@ -8,9 +8,9 @@ locals {
 
 #AWS RDS Connection Profile
 resource "google_datastream_connection_profile" "novi-connect-rds" {
-  display_name = "aws-rds-to-bigquery"
+  display_name =  var.rds_connection_name
   location = var.aws_region
-  connection_profile_id = "novi-connect-rds"
+  connection_profile_id =  var.rds_connection_profile_id
 
   forward_ssh_connectivity {
     hostname = var.SSH_Hostname
@@ -47,8 +47,8 @@ resource "google_datastream_stream" "aws_rds_to_bigquery" {
   source_config {
     source_connection_profile = google_datastream_connection_profile.novi-connect-rds.id
     postgresql_source_config {
-      publication = "novipublication"
-      replication_slot = "novirepliocationslot"
+      publication =  var.publication_name
+      replication_slot =  var.replication_slot_name
     }
   }
 
