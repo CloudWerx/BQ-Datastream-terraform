@@ -38,7 +38,7 @@ resource "google_datastream_connection_profile" "bigquery-replica" {
 }
 
 # Create Datastream Stream
-resource "google_datastream_stream" "AWS RDS to Bigquery" {
+resource "google_datastream_stream" "aws_rds_to_bigquery" {
   display_name     = "aws-rds-to-bigquery"
   location = var.gcp_region
   stream_id = "aws-rds-to-bigquery"
@@ -47,15 +47,15 @@ resource "google_datastream_stream" "AWS RDS to Bigquery" {
   source_config {
     source_connection_profile = google_datastream_connection_profile.novi-connect-rds.id
     postgresql_source_config {
-      publication = "publication"
-      replication_slot = "replication_slot"
+      publication = "novipublication"
+      replication_slot = "novirepliocationslot"
     }
   }
 
   destination_config {
     destination_connection_profile = google_datastream_connection_profile.bigquery-replica.id
     bigquery_destination_config {
-    data_freshness = "15s"
+    data_freshness = var.datafreshness
     }
   }
 

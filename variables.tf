@@ -4,8 +4,7 @@ variable "gcp_project" {
 }
 
 variable "gcp_credentials_file" {
-  description = "The path to the GCP credentials file"
-  type        = string
+  type = string
 }
 
 variable "gcp_region" {
@@ -46,3 +45,7 @@ variable "SSH_private_key" {
   type = string
 }
 
+variable "datafreshness" {
+  description = "Increment of data freshness in seconds, i.e. 90s"
+  type = string
+}
